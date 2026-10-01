@@ -1,0 +1,6 @@
+# Optional: LangChain stack for the LLM reasoning step (TODO).
+# The scaffold demo runs WITHOUT these. Install only when wiring a real model
+# in agent/llm.py.
+langchain>=0.3
+langchain-core>=0.3
+langchain-openai>=0.2
