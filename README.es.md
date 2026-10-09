@@ -131,3 +131,6 @@ MIT — ver [LICENSE](LICENSE).
 ## Atribuciones
 
 Los metadatos de códigos XID provienen de la documentación pública de errores XID de NVIDIA (`https://docs.nvidia.com/deploy/xid-errors/`) y de la guía de solución de problemas de GPU de Google Cloud. Este repo no está afiliado a NVIDIA.
+
+---
+All code in this repository is clean-room code written by Guangyi Zhao for learning and research purposes. It does not contain any client or employer confidential information.

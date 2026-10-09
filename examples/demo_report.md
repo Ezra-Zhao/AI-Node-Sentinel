@@ -1,6 +1,6 @@
 # Validation & Triage Report
 
-- **Generated:** 2026-10-09T20:16:17.155573+00:00
+- **Generated:** 2026-10-09T20:19:49.108383+00:00
 - **Data:** SIMULATED (synthetic telemetry — demo mode)
 - **Nodes scanned:** 1  |  **Events:** 26  |  **XID findings:** 10
 
@@ -16,7 +16,7 @@
 
 ### 1. 🟥 GPU has fallen off the bus (XID 79)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146354+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072240+00:00
 - **Recommended action:** `DRAIN_NODE` (confidence 0.80)
 - **Rationale:** XID 79: driver lost the GPU on PCIe; Redfish thermal alert — likely a thermal trip, not a dead GPU.
 - **Runbook evidence:**
@@ -25,7 +25,7 @@
 
 ### 2. 🟥 GPU has fallen off the bus (XID 79)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146400+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072309+00:00
 - **Recommended action:** `DRAIN_NODE` (confidence 0.80)
 - **Rationale:** XID 79: driver lost the GPU on PCIe; Redfish thermal alert — likely a thermal trip, not a dead GPU.
 - **Runbook evidence:**
@@ -34,7 +34,7 @@
 
 ### 3. 🟥 Double-bit ECC error (uncorrectable) (XID 48)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146414+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072328+00:00
 - **Recommended action:** `DRAIN_NODE` (confidence 0.85)
 - **Rationale:** XID 48: uncorrectable DRAM error. Drain the node so no new work lands on it; watch for recurrence before RMA.
 - **Runbook evidence:**
@@ -43,7 +43,7 @@
 
 ### 4. 🟨 Graphics Engine Exception (XID 13)
 
-- **Severity:** high  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146438+00:00
+- **Severity:** high  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072351+00:00
 - **Recommended action:** `CHECK_APPLICATION` (confidence 0.70)
 - **Rationale:** XID 13: usually application-level (bad memory access by the workload). Check the app/deploy first; do NOT drain the node on a single occurrence.
 - **Runbook evidence:**
@@ -52,7 +52,7 @@
 
 ### 5. 🟧 GSP RPC timeout (XID 119)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146448+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072362+00:00
 - **Recommended action:** `RESET_GPU` (confidence 0.75)
 - **Rationale:** XID 119: GSP firmware error. Try GPU reset first; drain + escalate if it recurs.
 - **Runbook evidence:**
@@ -61,7 +61,7 @@
 
 ### 6. 🟧 GSP error (XID 120)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146456+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072372+00:00
 - **Recommended action:** `RESET_GPU` (confidence 0.75)
 - **Rationale:** XID 120: GSP firmware error. Try GPU reset first; drain + escalate if it recurs.
 - **Runbook evidence:**
@@ -70,7 +70,7 @@
 
 ### 7. ⬜ Preemptive removal (application abort) (XID 45)
 
-- **Severity:** low  |  **Node:** `node-01`  |  **GPU:** 2  |  **Time:** 2026-10-09T20:16:17.146463+00:00
+- **Severity:** low  |  **Node:** `node-01`  |  **GPU:** 2  |  **Time:** 2026-10-09T20:19:49.072379+00:00
 - **Recommended action:** `IGNORE_EVENT` (confidence 0.80)
 - **Rationale:** XID 45: application abort tore down the GPU context (Ctrl-C / reset / sigkill). Not a hardware signal — log only.
 - **Runbook evidence:**
@@ -79,7 +79,7 @@
 
 ### 8. 🟩 Excessive single-bit ECC interrupts (XID 92)
 
-- **Severity:** medium  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:16:17.146472+00:00
+- **Severity:** medium  |  **Node:** `node-01`  |  **GPU:** -1  |  **Time:** 2026-10-09T20:19:49.072389+00:00
 - **Recommended action:** `MONITOR` (confidence 0.60)
 - **Rationale:** XID 92: elevated single-bit ECC rate. Watch closely — this is the early-warning signal for XID 48.
 - **Runbook evidence:**
@@ -88,7 +88,7 @@
 
 ### 9. 🟧 PMU halt error (XID 62)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** 5  |  **Time:** 2026-10-09T20:16:17.146480+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** 5  |  **Time:** 2026-10-09T20:19:49.072396+00:00
 - **Recommended action:** `RESET_GPU` (confidence 0.78)
 - **Rationale:** XID 62: PMU (power-management microcontroller) halted. GPU reset is the catalog immediate action.
 - **Runbook evidence:**
@@ -97,7 +97,7 @@
 
 ### 10. 🟥 Double-bit ECC error (uncorrectable) (XID 48)
 
-- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** 3  |  **Time:** 2026-10-09T20:16:17.146611+00:00
+- **Severity:** critical  |  **Node:** `node-01`  |  **GPU:** 3  |  **Time:** 2026-10-09T20:19:49.072653+00:00
 - **Recommended action:** `DRAIN_NODE` (confidence 0.85)
 - **Rationale:** XID 48: uncorrectable DRAM error. Drain the node so no new work lands on it; watch for recurrence before RMA.
 - **Runbook evidence:**

@@ -131,3 +131,6 @@ MIT — [LICENSE](LICENSE) 참조.
 ## 출처
 
 XID 코드 메타데이터는 NVIDIA 공개 XID 오류 문서(`https://docs.nvidia.com/deploy/xid-errors/`)와 Google Cloud GPU 문제 해결 가이드에서 가져왔습니다. 이 리포지토리는 NVIDIA와 무관합니다.
+
+---
+All code in this repository is clean-room code written by Guangyi Zhao for learning and research purposes. It does not contain any client or employer confidential information.

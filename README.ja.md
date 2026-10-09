@@ -131,3 +131,6 @@ MIT —— [LICENSE](LICENSE) を参照。
 ## 謝辞
 
 XID コードのメタデータは、NVIDIA 公開の XID エラードキュメント（`https://docs.nvidia.com/deploy/xid-errors/`）と Google Cloud の GPU トラブルシューティングガイドに基づきます。このリポジトリは NVIDIA と無関係です。
+
+---
+All code in this repository is clean-room code written by Guangyi Zhao for learning and research purposes. It does not contain any client or employer confidential information.

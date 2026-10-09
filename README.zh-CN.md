@@ -131,3 +131,6 @@ MIT —— 见 [LICENSE](LICENSE)。
 ## 致谢
 
 XID 代码元数据取自 NVIDIA 公开的 XID 错误文档（`https://docs.nvidia.com/deploy/xid-errors/`）和 Google Cloud 的 GPU 排错指南。本仓库与 NVIDIA 无关。
+
+---
+All code in this repository is clean-room code written by Guangyi Zhao for learning and research purposes. It does not contain any client or employer confidential information.
