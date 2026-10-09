@@ -87,6 +87,55 @@ def triage_decision(xid_code: int, context: dict) -> TriageDecision:
             rationale=(f"XID {xid_code}: GSP firmware error. Try GPU reset "
                        f"first; drain + escalate if it recurs."))
 
+    if xid_code == 62:  # PMU halt — catalog immediate action is GPU reset
+        if repeats >= 2:
+            return TriageDecision(
+                action="DRAIN_NODE_AND_ESCALATE", confidence=0.85,
+                rationale=(f"XID 62 recurring ({repeats}x): PMU keeps halting "
+                           f"after reset — escalate, likely a service ticket."))
+        return TriageDecision(
+            action="RESET_GPU", confidence=0.78,
+            rationale=("XID 62: PMU (power-management microcontroller) halted. "
+                       "GPU reset is the catalog immediate action."))
+
+    if xid_code == 64:  # DRAM retirement failure — containment failed
+        if repeats >= 2:
+            return TriageDecision(
+                action="DRAIN_NODE_AND_ESCALATE", confidence=0.85,
+                rationale=(f"XID 64 recurring ({repeats}x): row remapping keeps "
+                           f"failing — escalate, likely a service ticket."))
+        return TriageDecision(
+            action="RESET_GPU", confidence=0.80,
+            rationale=("XID 64: DRAM row/page remapping FAILED — the GPU could "
+                       "not contain an ECC error. Catalog immediate action is "
+                       "GPU reset; drain + escalate if it recurs."))
+
+    if xid_code == 92:  # Excessive single-bit ECC — early warning for XID 48
+        if repeats >= 3:
+            return TriageDecision(
+                action="DRAIN_NODE_AND_ESCALATE", confidence=0.80,
+                rationale=(f"XID 92 {repeats}x: sustained single-bit ECC storm "
+                           f"— precursor pattern for uncorrectable errors. "
+                           f"Drain and escalate before it becomes an XID 48."))
+        return TriageDecision(
+            action="MONITOR", confidence=0.60,
+            rationale=("XID 92: elevated single-bit ECC rate. Watch closely — "
+                       "this is the early-warning signal for XID 48."))
+
+    if xid_code == 45:  # Preemptive removal on app abort — benign by design
+        return TriageDecision(
+            action="IGNORE_EVENT", confidence=0.80,
+            rationale=("XID 45: application abort tore down the GPU context "
+                       "(Ctrl-C / reset / sigkill). Not a hardware signal — "
+                       "log only."))
+
+    if xid_code == 63:  # DRAM retirement event — informational
+        return TriageDecision(
+            action="MONITOR", confidence=0.65,
+            rationale=("XID 63: informational row-retirement event — the GPU "
+                       "is handling ECC via remapping. Log only; act only if "
+                       "chained to other XIDs."))
+
     if xid_code in (13, 31):  # App-level: do NOT drain on a single occurrence
         if repeats >= 3:
             return TriageDecision(

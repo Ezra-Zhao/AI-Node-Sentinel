@@ -102,4 +102,21 @@ number — low confidence must say what evidence is missing.""",
 severity unknown, route to human review, and record the raw dmesg line so the
 code can be researched against vendor documentation. An unknown code with a
 healthy Redfish profile is usually a new firmware event, not an emergency.""",
+
+    "xid-62-pmu": """XID 62 — PMU halt error, severity CRITICAL. The GPU's
+power-management microcontroller halted; the catalog immediate action is a
+GPU reset. If it recurs after reset, drain and escalate — a PMU that keeps
+halting usually ends in a service ticket.""",
+
+    "xid-92-sbe": """XID 92 — Excessive single-bit ECC interrupts, severity
+MEDIUM. A high single-bit error rate is often the precursor to uncorrectable
+(XID 48) errors. One occurrence: watch the GPU closely. Sustained repetition:
+drain the node before it becomes an XID 48.""",
+
+    "xid-45-63-benign": """XID 45 (preemptive removal on app abort) is benign by
+design: the application tore down its own GPU context — IGNORE the event,
+log only. XID 63 (DRAM row retirement) is informational: the GPU is handling
+ECC via remapping, monitor only. XID 64 (retirement FAILURE) is the
+exception — containment failed, so reset the GPU and escalate on
+recurrence.""",
 }

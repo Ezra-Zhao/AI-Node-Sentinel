@@ -42,9 +42,11 @@ class XidFinding:
 class TriageVerdict:
     """The triage outcome for a single XID finding."""
     finding: XidFinding
-    action: str            # e.g. "NEEDS_HUMAN_REVIEW" until the decision tree is encoded
-    confidence: float      # 0.0 - 1.0; 0.0 while the decision tree is a stub
+    action: str            # e.g. DRAIN_NODE, RESET_GPU, NEEDS_HUMAN_REVIEW
+    confidence: float      # 0.0 - 1.0, always paired with a rationale
     rationale: str
+    # RAG evidence: [(chunk_id, chunk_text)] grounding this verdict.
+    evidence: list[tuple[str, str]] = field(default_factory=list)
 
 
 @dataclass

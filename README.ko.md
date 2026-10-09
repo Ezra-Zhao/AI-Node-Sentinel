@@ -2,6 +2,8 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | **[한국어](README.ko.md)** | [Español](README.es.md) | [Português](README.pt.md) | [Русский](README.ru.md)
 
+> **Note:** this translation tracks an older README version (v0.1). The English README.md is authoritative for v1.0.
+
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue) ![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Status: scaffold](https://img.shields.io/badge/status-scaffold_v0.1-orange)
 
 **PCIe/XID 트리아지를 위한 포스트실리콘 하드웨어 진단 에이전트**

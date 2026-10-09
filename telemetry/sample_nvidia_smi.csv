@@ -1,0 +1,11 @@
+# SYNTHETIC SAMPLE — invented nvidia-smi CSV output for the demo.
+# Format matches: nvidia-smi --query-gpu=index,name,temperature.gpu,utilization.gpu,pstate,ecc.errors.uncorrected.volatile.total --format=csv,noheader
+# NOT a capture from real hardware.
+0, NVIDIA H100 80GB HBM3, 61, 98, P0, 0
+1, NVIDIA H100 80GB HBM3, 63, 97, P0, 0
+2, NVIDIA H100 80GB HBM3, 89, 12, P0, 0
+3, NVIDIA H100 80GB HBM3, 58, 99, P0, 2
+4, NVIDIA H100 80GB HBM3, 60, 96, P0, 0
+5, NVIDIA H100 80GB HBM3, 62, 95, P0, 0
+6, NVIDIA H100 80GB HBM3, 59, 97, P0, 0
+7, NVIDIA H100 80GB HBM3, 61, 98, P0, 0
