@@ -16,7 +16,7 @@ from agent.schemas import TelemetryEvent
 
 # Pool of XID codes to inject. 999 is a synthetic UNKNOWN code that
 # exercises the lookup-miss path; it does not exist in NVIDIA docs.
-XID_POOL = [13, 31, 48, 74, 79, 119, 120, 999]
+XID_POOL = [13, 31, 45, 48, 62, 63, 64, 74, 79, 92, 119, 120, 999]
 
 
 def simulate_cluster(num_nodes: int = 4, gpus_per_node: int = 8,
