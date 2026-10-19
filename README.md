@@ -182,3 +182,17 @@ troubleshooting guide. This repo is not affiliated with NVIDIA.
 ---
 
 All code in this repository is clean-room code written by Guangyi Zhao for learning and research purposes. It does not contain any client or employer confidential information.
+
+## TypeScript MCP server (add-on)
+
+[`mcp-server-ts/`](mcp-server-ts/) contains a TypeScript MCP server
+(official `@modelcontextprotocol/sdk`, stdio transport) that exposes this
+repo's diagnostic knowledge to MCP clients: `lookup_xid` (the same 12-code
+table as `tools/xid_lookup.py`), `list_xids`, and `search_runbook`
+(a faithful port of the TF-IDF retriever in `rag/retriever.py` over the
+same runbook chunks). Its data files are generated from the Python
+sources by a script — there is no second, hand-maintained dataset. The
+Python pipeline is unchanged and does not depend on it. See
+[`mcp-server-ts/README.md`](mcp-server-ts/README.md) for install/run
+instructions and [`mcp-server-ts/VERIFICATION.md`](mcp-server-ts/VERIFICATION.md)
+for the recorded build + smoke-test results.
