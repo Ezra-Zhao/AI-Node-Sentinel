@@ -4,6 +4,9 @@
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue) ![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Status: v1.1](https://img.shields.io/badge/status-v1.1-green)
 
+Support & more: [GitHub Sponsors](https://github.com/sponsors/Ezra-Zhao) · [Gumroad — templates & workbooks I use](https://ezraflow28.gumroad.com) · [Ko-fi](https://ko-fi.com/ezra777zhao)
+
+
 **A Post-Silicon & Hardware Diagnostic Agent powered by LangChain & Redfish Telemetry.**
 
 An AI-agent-based diagnostic pipeline for GPU node failures in AI infrastructure:
