@@ -1,0 +1,303 @@
+=== MCP SMOKE TEST (official SDK client over stdio) ===
+date: 2026-10-22T22:04:50+00:00  node: v24.20.0
+ai-node-sentinel-context MCP server running on stdio
+
+===== initialize =====
+connected; server info: {"name":"ai-node-sentinel-context","version":"0.1.0"}
+
+===== tools/list response =====
+{
+  "tools": [
+    {
+      "name": "search_runbooks",
+      "title": "Search diagnostic runbooks",
+      "description": "Search the AI-Node-Sentinel GPU diagnostic runbook set by keyword (XID code, component, symptom term). Returns ranked matches with id, title, severity, score, matched terms, and a summary. Use get_runbook with a returned id to fetch the full text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Keyword query, e.g. 'xid 79' or 'ecc memory'"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "description": "Max results to return (default 5)"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "get_runbook",
+      "title": "Get one runbook in full",
+      "description": "Return the full text of one AI-Node-Sentinel runbook by id: summary, ordered steps, cautions, and evidence to collect. Known ids: xid-79-bus, xid-48-dbe, xid-92-sbe, xid-74-nvlink, xid-119-120-gsp, xid-13-31-app, xid-62-63-64-memory-fw, xid-45-abort, redfish-thermal-power, repeat-and-unknown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Runbook id, e.g. 'xid-79-bus'"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "diagnose_hint",
+      "title": "Symptom to troubleshooting steps",
+      "description": "Given a free-text symptom (e.g. 'gpu disappeared from nvidia-smi' or 'xid 79 in dmesg'), return the best-matching runbooks with their first troubleshooting steps, cautions, and evidence to collect. No match means: collect evidence and route to a human — this tool never invents a diagnosis.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symptom": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Free-text symptom description"
+          }
+        },
+        "required": [
+          "symptom"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}
+
+===== tools/call search_runbooks {query:'xid 79', limit:3} =====
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"query\": \"xid 79\",\n  \"count\": 3,\n  \"results\": [\n    {\n      \"id\": \"xid-79-bus\",\n      \"title\": \"XID 79 — GPU has fallen off the bus\",\n      \"severity\": \"critical\",\n      \"score\": 23,\n      \"matched_terms\": [\n        \"xid-79\",\n        \"xid\",\n        \"79\",\n        \"xid 79\"\n      ],\n      \"summary\": \"The driver lost PCIe communication with the GPU. In this project's triage experience the cause is more often power delivery or a thermal trip than a dead card, so evidence comes first: in-band tools cannot see the card in this state, which makes out-of-band Redfish telemetry the primary source.\"\n    },\n    {\n      \"id\": \"xid-45-abort\",\n      \"title\": \"XID 45 — Preemptive removal after application abort (benign)\",\n      \"severity\": \"low\",\n      \"score\": 5,\n      \"matched_terms\": [\n        \"xid\",\n        \"79\"\n      ],\n      \"summary\": \"The benign XID: the user application was aborted (Ctrl-C, GPU reset, sigkill) and the driver tore down the GPU context. This is cleanup, not a fault.\"\n    },\n    {\n      \"id\": \"repeat-and-unknown\",\n      \"title\": \"Meta-rules — repeat events and unknown XID codes\",\n      \"severity\": \"info\",\n      \"score\": 4,\n      \"matched_terms\": [\n        \"xid\"\n      ],\n      \"summary\": \"Two rules that govern every other runbook in this set. Repeat rule: the same XID code on the same GPU twice within 24 hours upgrades the response one level (check becomes drain, drain becomes drain plus escalate) — recurrence is the signal that separates a flaky card from a bad run. Unknown rule: a code that is not in the lookup table is never guessed at.\"\n    }\n  ]\n}"
+    }
+  ]
+}
+
+===== tools/call get_runbook {id:'xid-79-bus'} =====
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"cautions\": [\n    \"Do not conclude the GPU is dead from XID 79 alone — thermal trips and power droop present identically.\",\n    \"Do not reboot and return the node to the pool without the Redfish check; the fault will recur under load.\"\n  ],\n  \"evidence_to_collect\": [\n    \"dmesg Xid lines\",\n    \"Redfish inlet/hotspot temperatures\",\n    \"Redfish PSU redundancy\",\n    \"Redfish PCIe error counters\"\n  ],\n  \"id\": \"xid-79-bus\",\n  \"keywords\": [\n    \"xid 79\",\n    \"fallen off the bus\",\n    \"pcie\",\n    \"gpu disappeared\",\n    \"nvidia-smi no devices\",\n    \"bus\"\n  ],\n  \"severity\": \"critical\",\n  \"steps\": [\n    \"Confirm the event: grep dmesg for 'Xid 79' and note GPU PCI address, node, and timestamp.\",\n    \"Check Redfish out-of-band telemetry: inlet temperature, GPU hotspot if reported, and PSU redundancy status.\",\n    \"If PSU redundancy is lost or PCIe uncorrectable counters are above zero, treat power delivery as the prime suspect and check input draw vs provisioned capacity before touching the card.\",\n    \"If hotspot is high while inlet is normal (roughly 23-27C), suspect card cooling (heatsink mount, fan zone) rather than the room.\",\n    \"Drain the node so no new work lands on it while diagnosis continues.\",\n    \"If power and thermal look normal, reseat or move the card; if XID 79 persists after reseat, open an RMA/service ticket.\"\n  ],\n  \"summary\": \"The driver lost PCIe communication with the GPU. In this project's triage experience the cause is more often power delivery or a thermal trip than a dead card, so evidence comes first: in-band tools cannot see the card in this state, which makes out-of-band Redfish telemetry the primary source.\",\n  \"symptoms\": [\n    \"gpu disappeared from nvidia-smi\",\n    \"driver lost the gpu\",\n    \"xid 79 in dmesg\",\n    \"node lost a gpu under load\"\n  ],\n  \"title\": \"XID 79 — GPU has fallen off the bus\",\n  \"xids\": [\n    79\n  ]\n}"
+    }
+  ]
+}
+
+===== tools/call diagnose_hint {symptom:'gpu disappeared from nvidia-smi after xid 79'} =====
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"symptom\": \"gpu disappeared from nvidia-smi after xid 79\",\n  \"matches\": [\n    {\n      \"runbook_id\": \"xid-79-bus\",\n      \"title\": \"XID 79 — GPU has fallen off the bus\",\n      \"severity\": \"critical\",\n      \"score\": 53,\n      \"first_steps\": [\n        \"Confirm the event: grep dmesg for 'Xid 79' and note GPU PCI address, node, and timestamp.\",\n        \"Check Redfish out-of-band telemetry: inlet temperature, GPU hotspot if reported, and PSU redundancy status.\",\n        \"If PSU redundancy is lost or PCIe uncorrectable counters are above zero, treat power delivery as the prime suspect and check input draw vs provisioned capacity before touching the card.\"\n      ],\n      \"cautions\": [\n        \"Do not conclude the GPU is dead from XID 79 alone — thermal trips and power droop present identically.\",\n        \"Do not reboot and return the node to the pool without the Redfish check; the fault will recur under load.\"\n      ],\n      \"evidence_to_collect\": [\n        \"dmesg Xid lines\",\n        \"Redfish inlet/hotspot temperatures\",\n        \"Redfish PSU redundancy\",\n        \"Redfish PCIe error counters\"\n      ]\n    },\n    {\n      \"runbook_id\": \"xid-119-120-gsp\",\n      \"title\": \"XID 119/120 — GSP RPC timeout / GSP error\",\n      \"severity\": \"critical\",\n      \"score\": 13,\n      \"first_steps\": [\n        \"Attempt a GPU reset (nvidia-smi --gpu-reset) where the platform supports it.\",\n        \"Verify the GPU returns and trains cleanly after reset.\",\n        \"If GSP errors repeat on the same GPU after reset, drain the node and escalate — recurring GSP faults usually end in a service ticket.\"\n      ],\n      \"cautions\": [\n        \"Do not loop resets indefinitely; one reset, then drain-and-escalate on recurrence.\"\n      ],\n      \"evidence_to_collect\": [\n        \"dmesg Xid lines\",\n        \"reset result\",\n        \"recurrence count within 24h\"\n      ]\n    },\n    {\n      \"runbook_id\": \"xid-45-abort\",\n      \"title\": \"XID 45 — Preemptive removal after application abort (benign)\",\n      \"severity\": \"low\",\n      \"score\": 11,\n      \"first_steps\": [\n        \"Log the event and move on.\",\n        \"Investigate only if XID 45 appears chained with real error XIDs (for example 48 or 79) in the same time window — then follow the other code's runbook.\"\n      ],\n      \"cautions\": [\n        \"Do not page anyone for XID 45 alone.\",\n        \"Do not let a chained XID 45 hide the real error next to it.\"\n      ],\n      \"evidence_to_collect\": [\n        \"co-occurring XID codes in the same window\"\n      ]\n    }\n  ],\n  \"note\": \"Steps are heuristic defaults from the AI-Node-Sentinel runbook set. Validate against your site runbook before acting on production hardware. Recurrence within 24h upgrades the response one level (see runbook 'repeat-and-unknown').\"\n}"
+    }
+  ]
+}
+
+===== SMOKE RESULT =====
+PASS - initialize, tools/list, and all 3 tools OK
+
+=== CLI: node dist/cli.js search "xid 79" ===
+{
+  "query": "xid 79",
+  "count": 5,
+  "results": [
+    {
+      "id": "xid-79-bus",
+      "title": "XID 79 — GPU has fallen off the bus",
+      "severity": "critical",
+      "score": 23,
+      "matched_terms": [
+        "xid-79",
+        "xid",
+        "79",
+        "xid 79"
+      ],
+      "summary": "The driver lost PCIe communication with the GPU. In this project's triage experience the cause is more often power delivery or a thermal trip than a dead card, so evidence comes first: in-band tools cannot see the card in this state, which makes out-of-band Redfish telemetry the primary source."
+    },
+    {
+      "id": "xid-45-abort",
+      "title": "XID 45 — Preemptive removal after application abort (benign)",
+      "severity": "low",
+      "score": 5,
+      "matched_terms": [
+        "xid",
+        "79"
+      ],
+      "summary": "The benign XID: the user application was aborted (Ctrl-C, GPU reset, sigkill) and the driver tore down the GPU context. This is cleanup, not a fault."
+    },
+    {
+      "id": "repeat-and-unknown",
+      "title": "Meta-rules — repeat events and unknown XID codes",
+      "severity": "info",
+      "score": 4,
+      "matched_terms": [
+        "xid"
+      ],
+      "summary": "Two rules that govern every other runbook in this set. Repeat rule: the same XID code on the same GPU twice within 24 hours upgrades the response one level (check becomes drain, drain becomes drain plus escalate) — recurrence is the signal that separates a flaky card from a bad run. Unknown rule: a code that is not in the lookup table is never guessed at."
+    },
+    {
+      "id": "xid-119-120-gsp",
+      "title": "XID 119/120 — GSP RPC timeout / GSP error",
+      "severity": "critical",
+      "score": 4,
+      "matched_terms": [
+        "xid"
+      ],
+      "summary": "The GPU System Processor — the GPU's embedded microcontroller — stopped responding to the driver. Reset is the first response; recurrence after reset is the escalation signal."
+    },
+    {
+      "id": "xid-13-31-app",
+      "title": "XID 13 / 31 — Graphics Engine Exception / GPU memory page fault",
+      "severity": "high",
+      "score": 4,
+      "matched_terms": [
+        "xid"
+      ],
+      "summary": "Usually application-level: an illegal memory access by the CUDA workload rather than broken hardware. The discipline in this runbook is restraint — a single occurrence is a software conversation, not a node drain."
+    }
+  ]
+}
+
+=== CLI: node dist/cli.js diagnose "single-bit ecc rate climbing" ===
+{
+  "symptom": "single-bit ecc rate climbing",
+  "matches": [
+    {
+      "runbook_id": "xid-92-sbe",
+      "title": "XID 92 — Excessive single-bit ECC interrupts",
+      "severity": "medium",
+      "score": 24,
+      "first_steps": [
+        "Note the GPU and start watching its ECC counters (nvidia-smi -q) on a short cadence.",
+        "Track the XID 92 rate over time; a rising trend matters more than any single count.",
+        "If XID 92 keeps firing at a sustained rate, or XID 48 appears on the same GPU, drain the node and escalate."
+      ],
+      "cautions": [
+        "Do not drain on a single isolated XID 92 — correctable errors are expected background noise at fleet scale.",
+        "Do not ignore a sustained storm either; that is exactly how an XID 48 surprises you later."
+      ],
+      "evidence_to_collect": [
+        "nvidia-smi -q ECC counters over time",
+        "XID 92 timestamps for rate calculation"
+      ]
+    },
+    {
+      "runbook_id": "xid-48-dbe",
+      "title": "XID 48 — Double-bit ECC error (uncorrectable)",
+      "severity": "critical",
+      "score": 9,
+      "first_steps": [
+        "Drain the node so no new work lands on the affected GPU.",
+        "Keep the GPU idle and record the event with GPU serial, slot, and node for the service record.",
+        "Check whether the same GPU reported XID 92 (single-bit ECC storm) in the preceding days — that is the classic precursor pattern."
+      ],
+      "cautions": [
+        "Do not simply reboot and return the node to the pool — uncorrectable errors tend to recur.",
+        "A single XID 48 is drain-and-watch; recurrence, not the first event, is the RMA trigger in this runbook."
+      ],
+      "evidence_to_collect": [
+        "dmesg Xid lines",
+        "nvidia-smi -q ECC counters",
+        "prior XID 92 history for the same GPU"
+      ]
+    },
+    {
+      "runbook_id": "xid-62-63-64-memory-fw",
+      "title": "XID 62 / 63 / 64 — PMU halt and DRAM row retirement",
+      "severity": "high",
+      "score": 3,
+      "first_steps": [
+        "Identify which code fired; the response differs per code, not per 'memory-ish' feeling.",
+        "XID 62: GPU reset; if the PMU keeps halting after reset, drain and escalate instead of resetting in a loop.",
+        "XID 63: log it and watch the single-bit error trend; no other action."
+      ],
+      "cautions": [
+        "Do not treat XID 63 as a fault — it is the hardware working as designed.",
+        "Do not keep resetting a GPU whose PMU halts repeatedly."
+      ],
+      "evidence_to_collect": [
+        "exact XID code",
+        "reset outcome",
+        "SBE trend from ECC counters"
+      ]
+    }
+  ],
+  "note": "Steps are heuristic defaults from the AI-Node-Sentinel runbook set. Validate against your site runbook before acting on production hardware. Recurrence within 24h upgrades the response one level (see runbook 'repeat-and-unknown')."
+}
+
+=== CLI: node dist/cli.js get redfish-thermal-power (first 15 lines) ===
+{
+  "cautions": [
+    "Never interpret a hotspot number without the inlet number next to it; the comparison is the diagnosis."
+  ],
+  "evidence_to_collect": [
+    "Redfish inlet and hotspot temperatures",
+    "PSU redundancy flag",
+    "power draw vs provisioned capacity",
+    "PCIe error counters"
+  ],
+  "id": "redfish-thermal-power",
+  "keywords": [
+    "redfish",
+    "thermal",
+    "inlet temperature",
+
+=== CLI: node dist/cli.js get no-such-id (expect exit 2) ===
+{
+  "error": "Unknown runbook id: no-such-id",
+  "known_ids": [
+    "xid-79-bus",
+    "xid-48-dbe",
+    "xid-92-sbe",
+    "xid-74-nvlink",
+    "xid-119-120-gsp",
+    "xid-13-31-app",
+    "xid-62-63-64-memory-fw",
+    "xid-45-abort",
+    "redfish-thermal-power",
+    "repeat-and-unknown"
+  ]
+}
+cli_bad_id_exit=2
+
+=== npm pack --dry-run ===
+npm notice Tarball Contents
+npm notice 6.4kB README.md
+npm notice 12.4kB data/runbooks.json
+npm notice 2.5kB dist/cli.js
+npm notice 977B dist/index.js
+npm notice 5.6kB dist/runbooks.js
+npm notice 3.6kB dist/server.js
+npm notice 765B package.json
+npm notice Tarball Details
+npm notice name: ai-node-sentinel-context
+npm notice version: 0.1.0
+npm notice filename: ai-node-sentinel-context-0.1.0.tgz
+npm notice package size: 11.7 kB
+npm notice unpacked size: 32.1 kB
+npm notice shasum: 33ef3fbcc6845ecc7866116df4ee6801a4cdf2fb
+npm notice integrity: sha512-3lYnUR+5g0OYG[...]xmgSn++yD6i4A==
+npm notice total files: 7
